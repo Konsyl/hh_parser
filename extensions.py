@@ -15,12 +15,8 @@ strs_for_requirements = ['Требования', 'от кандидата',
                          'Требуем', 'Ждем', 'Ожидания',
                          'потребуются']
 
-strs_for_satisfy = ['django', 'flask', 'rest']
 
-strs_for_exp = ['не требуется', '1-3 года', '3-6 лет']
-
-
-def find_requirements(vac):
+def find_requirements(vac, headers):
     vac_response = requests.get(vac.get('href'), headers=headers)
     vac_body = BeautifulSoup(vac_response.text)
 
@@ -47,14 +43,39 @@ def find_requirements(vac):
     return None
 
 
-def check_skills(requirements):
+def check_skills(requirements, skills, per):
+    count_max = len(requirements)
+    count_temp = 0
     for req in requirements:
-        for skill in strs_for_satisfy:
+        for skill in skills:
             if skill in req:
-                return True
+                count_temp += 1
+                if count_temp / count_max >= per:
+                    return True
     return False
 
 
-def check_exp(vac):
+def check_exp(vac, exp, headers):
     vac_response = BeautifulSoup(requests.get(vac.get('href'), headers=headers).text)
-    return vac_response.find('span', attrs={'data-qa': 'vacancy-experience'}).text.lower() in strs_for_exp
+    exp_from_vac = vac_response.find('span', attrs={'data-qa': 'vacancy-experience'}).text.lower()
+    for item in exp:
+        if exp_from_vac in exp:
+            print('Да')
+            return True
+    return False
+
+def send_telegram(text: str):
+    token = "1217501559:AAFPYl8mT5H4J-OYc4vnNCnea5ztmEzGE9Q"
+    url = "https://api.telegram.org/bot"
+    channel_id = "316852238"
+    url += token
+    method = url + "/sendMessage"
+
+    r = requests.get(method, data={
+         "chat_id": channel_id,
+         "text": text
+          })
+
+    if r.status_code != 200:
+        print(r)
+        raise Exception("post_text error")
