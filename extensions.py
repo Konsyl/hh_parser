@@ -65,7 +65,7 @@ def check_exp(vac, exp, headers):
     return False
 
 def send_telegram(text: str):
-    token = "1217501559:AAFPYl8mT5H4J-OYc4vnNCnea5ztmEzGE9Q"
+    token = "1217501559:"
     url = "https://api.telegram.org/bot"
     channel_id = "316852238"
     url += token
